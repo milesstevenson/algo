@@ -1,4 +1,5 @@
 
+
 /******************************************************************************
  *  Compilation:  javac Point.java
  *  Execution:    java Point
@@ -77,14 +78,14 @@ public class Point implements Comparable<Point> {
     /**
      * Getter for x.
      */
-    public int getX() {
+    private int getX() {
         return x;
     }
 
     /**
      * Getter for y.
      */
-    public int getY() {
+    private int getY() {
         return y;
     }
 
