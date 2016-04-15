@@ -1,7 +1,18 @@
 package chapter15;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 public class SatisfiesBSTProperty {
 
+    /**
+     * Time complexity: O(n)
+     * Additional space: O(h)
+     *
+     * Uses implicit DFS, and can be inefficient if the left branch
+     * does not hold the BST property. Can we shrink the time complexity
+     * down a little?
+     */
     public static boolean isBST(BSTNode tree) {
         return checkProperty(tree, Integer.MAX_VALUE, Integer.MIN_VALUE);
     }
@@ -21,6 +32,45 @@ public class SatisfiesBSTProperty {
         return false;
     }
 
+    /**
+     * If we take a BST approach, we can save some computation time if we
+     * encounter a node that doesn't hold the property.
+     */
+    public static boolean isBST_BFS(BSTNode tree) {
+        Queue<QEntry> q = new LinkedList<>();
+        QEntry entry = new QEntry(tree, Integer.MAX_VALUE, Integer.MIN_VALUE);
+        q.add(entry);
+
+        while (!q.isEmpty()) {
+            QEntry item = q.poll();
+            BSTNode node = item.node;
+
+            if (node.data() > item.less || node.data() < item.more)
+                return false;
+
+            QEntry leftEntry = new QEntry(node.left(), node.data(), item.more);
+            QEntry rightEntry = new QEntry(node.right(), item.less, node.data());
+
+            if (null != node.left())
+                q.add(leftEntry);
+            if (null != node.right())
+                q.add(rightEntry);
+        }
+
+        return true;
+    }
+
+    private static class QEntry {
+        public BSTNode node;
+        public int less, more;
+
+        public QEntry(BSTNode node, int less, int more) {
+            this.node = node;
+            this.less = less;
+            this.more = more;
+        }
+    }
+
     public static void main(String[] args) {
 
         /**
@@ -37,7 +87,7 @@ public class SatisfiesBSTProperty {
         BSTNode lsub = new BSTNode(8, llsub, null);
         BSTNode tree = new BSTNode(10, lsub, rsub);
 
-        System.out.println("Tree1: " + isBST(tree));
+        System.out.println("Tree1: " + isBST_BFS(tree));
 
 
         /**
@@ -54,6 +104,6 @@ public class SatisfiesBSTProperty {
         BSTNode l_sub = new BSTNode(8, ll_sub, null);
         BSTNode t_ree = new BSTNode(10, l_sub, r_sub);
 
-        System.out.println("Tree2: " + isBST(t_ree));
+        System.out.println("Tree2: " + isBST_BFS(t_ree));
     }
 }
