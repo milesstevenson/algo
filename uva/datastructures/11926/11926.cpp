@@ -37,26 +37,83 @@
   // 'NO CONFLICT' if there are no overlaps between any tasks for minutes
   // 0..1000000, or 'CONFLICT' if there is at least one overlap.
 #include <iostream>
+#include <bitset>
 using namespace std;
 
-int main() {
-  int n, m;
-  cin >> n >> m;
 
-  while (!(n == 0 && m == 0)) {
-    int bits = 0;
-    for (int i = 0; i < n; i++) {
-      int start, end;
-      cin >> start >> end;
-      // do something
+bitset<1000001> range;
 
-      for (int j = 0; j < m; j++) {
-        int start, end, repetition_int;
-        cin >> start >> end >> repetition_int;
-        // do something
+bool collisionsFoundNoRep(int n) {
+  int start, end;
+  bool collideFound = false;
+
+  for (int i = 0; i < n; i++) {
+    cin >> start >> end;
+    if (!collideFound) {
+      for (int j = start; j <= end; j++) {
+        if (j != end) {
+          bool collides = range.test(j);
+          if (collides) {
+            collideFound = true;
+          }
+          else {
+            range.set(j);
+          }
+        }
       }
     }
-    cin >> n >> m;
   }
-  return 0;
+
+  return collideFound;
+}
+
+bool collisionsFoundRep(int m) {
+  int start, end, rep;
+  bool collideFound = false;
+
+  for (int i = 0; i < m; i++) {
+    cin >> start >> end >> rep;
+    int diff = end - start;
+    int j = start;
+    if (!collideFound) {
+      while (j <= 1000000) {
+        if (j > end) {
+          start += rep;
+          end = start + diff;
+          j = start;
+          continue;
+        }
+
+        if (j != end) {
+          bool collides = range.test(j);
+          if (collides) {
+            collideFound = true;
+          }
+          else {
+            range.set(j);
+          }
+        }
+        j++;
+      }
+    }
+  }
+  return collideFound;
+}
+
+int main(void) {
+  int n, m;
+  while (cin >> n >> m, (n != 0 || m != 0)) {
+    //cout << "testing: " << n << " and " << m << endl;
+    bool collidesNoRep = collisionsFoundNoRep(n);
+    bool collidesRep = collisionsFoundRep(m);
+    bool collides = collidesNoRep || collidesRep;
+
+    if (collides) {
+      cout << "CONFLICT" << endl;
+    }
+    else {
+      cout << "NO CONFLICT" << endl;
+    }
+    range.reset();
+  }
 }
